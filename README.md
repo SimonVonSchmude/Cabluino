@@ -2,4 +2,4 @@
 
 ## Still in Dev
 
-By Simon von Schmude & Lion Beck @ weißensee kunsthochschule berlin
+By Simon von Schmude & Lion Beck @ weißensee kunsthochschule berlin 2024
