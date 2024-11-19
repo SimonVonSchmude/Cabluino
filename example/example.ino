@@ -1,26 +1,37 @@
 #include "OSCSerial.h"
+#include <Adafruit_NeoPixel.h>
 
-anchor<int> led1("/led1");
-anchor<int> led2("/led2");
-anchor<int> led3("/led3");
+#define LED_PIN 3
+#define LED_COUNT 6
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+
+anchor<int> led11("/led11");
+anchor<int> ledStrip("/ledstrip", LED_COUNT);
 
 long timer = 0;
 
 void setup() {
   OSCSerial.begin(115200);
 
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
+
+  strip.begin();            // INITIALIZE NeoPixel strip object (REQUIRED)
+  strip.show();             // Turn OFF all pixels ASAP
+  strip.setBrightness(50);  // Set BRIGHTNESS to about 1/5 (max = 255)
 }
 
 void loop() {
 
   OSCSerial.receive();
 
-  analogWrite(9, led1.value);
-  analogWrite(10, led2.value);
-  analogWrite(11, led3.value);
+  analogWrite(11, led11.value[0]);
+
+  for (int i = 0; i < LED_COUNT; i++) {
+    strip.setPixelColor(i, strip.Color(ledStrip.value[i], ledStrip.value[i], ledStrip.value[i]));
+  }
+
+  strip.show();
 
   if (millis() - timer > 16) {
     timer = millis();

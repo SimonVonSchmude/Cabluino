@@ -34,25 +34,33 @@ bool OSCSerial::receive() {
   }
 
   for (int i = 0; i < anchor<int>::numInstances; i++) {
-    OSCMessage msg = bndl.getOSCMessage((char*)anchor<int>::instances[i]->address);
-    if (!msg.hasError() && msg.isInt(0)) {
-      int _val = msg.getInt(0);
-      anchor<int>::instances[i]->value = _val;
+    anchor<int> *inst = anchor<int>::instances[i];
+    OSCMessage msg = bndl.getOSCMessage((char *)inst->address);
+    if (!msg.hasError()) {
+      for (int j = 0; j < inst->getSize(); j++) {
+        if (msg.isInt(j)) {
+          (*inst)[j] = msg.getInt(j);
+        }
+      }
     }
   }
 
   for (int i = 0; i < anchor<float>::numInstances; i++) {
-    OSCMessage msg = bndl.getOSCMessage((char*)anchor<float>::instances[i]->address);
-    if (!msg.hasError() && msg.isFloat(0)) {
-      float _val = msg.getFloat(0);
-      anchor<float>::instances[i]->value = _val;
+    anchor<float> *inst = anchor<float>::instances[i];
+    OSCMessage msg = bndl.getOSCMessage((char *)inst->address);
+    if (!msg.hasError()) {
+      for (int j = 0; j < inst->getSize(); j++) {
+        if (msg.isFloat(j)) {
+          (*inst)[j] = msg.getFloat(j);
+        }
+      }
     }
   }
 
   return true;
 }
 
-void OSCSerial::send(OSCBundle& bundleOUT) {
+void OSCSerial::send(OSCBundle &bundleOUT) {
   SLIPSerial.beginPacket();
   bundleOUT.send(SLIPSerial);
   SLIPSerial.endPacket();
