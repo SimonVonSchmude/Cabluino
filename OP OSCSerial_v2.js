@@ -251,7 +251,6 @@ async function send() {
 
         writer = port.writable.getWriter();
         writerLocked = true;
-        op.log(slipEncoded); // NEW
         await writer.write(slipEncoded);
     }
     catch (err) {
@@ -278,12 +277,28 @@ function inferType(value) {
 
 function transformJsonToOsc(json) {
     const packets = Object.keys(json).map((key) => {
+        const value = json[key];
+
+        // Check if the value is an array
+        if (Array.isArray(value)) {
+            return {
+                "address": `/${key}`,
+                "args": value.map((item) => {
+                    return {
+                        "type": inferType(item),
+                        "value": item
+                    };
+                })
+            };
+        }
+
+        // Handle individual value
         return {
             "address": `/${key}`,
             "args": [
                 {
-                    "type": inferType(json[key]),
-                    "value": json[key]
+                    "type": inferType(value),
+                    "value": value
                 }
             ]
         };
