@@ -43,6 +43,8 @@ Serial.write(0xAA);
       for (int j = 0; j < inst->getSize(); j++) {
         if (msg.isInt(j)) {
           (*inst)[j] = msg.getInt(j);
+        } else if (msg.isFloat(j)) {
+          (*inst)[j] = (int)msg.getFloat(j);
         }
       }
     }
