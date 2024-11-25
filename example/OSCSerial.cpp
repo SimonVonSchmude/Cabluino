@@ -1,4 +1,5 @@
-#include "pins_arduino.h"
+#include "OSCMessage.h"
+#include "Arduino.h"
 // #include "Arduino.h"
 #include "OSCSerial.h"
 // #include <OSCBundle.h>
@@ -11,7 +12,10 @@ void OSCSerial::begin(long baudrate) {
 }
 
 bool OSCSerial::receive() {
-Serial.write(0xAA);
+
+  SLIPSerial.beginPacket();
+  SLIPSerial.write(0XAA);
+  SLIPSerial.endPacket();
 
   OSCBundle bndl;
   int size;
@@ -25,6 +29,8 @@ Serial.write(0xAA);
       while (size--) {
         bndl.fill(SLIPSerial.read());
       }
+    } else {
+      //break;
     }
   }
 

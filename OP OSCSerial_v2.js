@@ -18,7 +18,7 @@ const
 
     sendObject = op.inObject("Data"),
 
-    sendTrigger = op.inTriggerButton("Send"),
+    // sendTrigger = op.inTriggerButton("Send"),
     closeTrigger = op.inTriggerButton("Close"),
     forgetTrigger = op.inTriggerButton("Forget all devices"),
 
@@ -31,11 +31,13 @@ let port, writer, reader, connected;
 let keepReading = true;
 let writerLocked = false;
 
+let sending = false;
+
 // SLIPbufferSize.onChange = closePort;
 baudRate.onChange = closePort;
 connectNewTrigger.onTriggered = newPort;
 connectLastTrigger.onTriggered = lastPort;
-sendTrigger.onTriggered = send;
+// sendTrigger.onTriggered = send;
 closeTrigger.onTriggered = closePort;
 forgetTrigger.onTriggered = forgetAllPorts;
 
@@ -82,6 +84,13 @@ function convertToJson(oscMessage) {
 }
 
 let logMessage = function (msg) {
+    if (sending) { return; }
+
+    if (msg == 170) {
+        send();
+        return;
+    }
+
     // op.log("A SLIP message was received! Here is it: " + msg);
     // const uint8Array = new Uint8Array([47, 112, 111, 116, 0, 0, 0, 0, 44, 105, 0, 0, 0, 0, 3, 255]);
 
@@ -175,14 +184,8 @@ async function readUntilClosed() {
                     // |reader| has been canceled.
                     break;
                 }
-
-                if (value[0] === 170) {
-                    send();
-                }
-                else {
-                    // Do something with |value|…
-                    decoder.decode(value);
-                }
+                // Do something with |value|…
+                decoder.decode(value);
             }
         }
         catch (err) {
@@ -246,6 +249,8 @@ async function forgetAllPorts() {
 }
 
 async function send() {
+    sending = true;
+
     if (!connected || writerLocked) { return; }
 
     try {
@@ -265,6 +270,8 @@ async function send() {
     finally {
         writer.releaseLock();
         writerLocked = false;
+
+        sending = false;
     }
 }
 
