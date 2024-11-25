@@ -1,3 +1,4 @@
+#include "pins_arduino.h"
 // #include "Arduino.h"
 #include "OSCSerial.h"
 // #include <OSCBundle.h>
@@ -10,6 +11,8 @@ void OSCSerial::begin(long baudrate) {
 }
 
 bool OSCSerial::receive() {
+Serial.write(0xAA);
+
   OSCBundle bndl;
   int size;
 

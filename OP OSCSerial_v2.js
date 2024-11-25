@@ -175,8 +175,14 @@ async function readUntilClosed() {
                     // |reader| has been canceled.
                     break;
                 }
-                // Do something with |value|…
-                decoder.decode(value);
+
+                if (value[0] === 170) {
+                    send();
+                }
+                else {
+                    // Do something with |value|…
+                    decoder.decode(value);
+                }
             }
         }
         catch (err) {
