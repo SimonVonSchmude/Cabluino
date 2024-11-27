@@ -1,14 +1,16 @@
-#include "OSCMessage.h"
-#include "Arduino.h"
-// #include "Arduino.h"
 #include "OSCSerial.h"
 // #include <OSCBundle.h>
 // #include <SLIPEncodedSerial.h>
 
 SLIPEncodedSerial OSCSerial::SLIPSerial(Serial);
+uint16_t OSCSerial::_wTime = 5;
 
 void OSCSerial::begin(long baudrate) {
   SLIPSerial.begin(baudrate);
+}
+
+void OSCSerial::waitingTime(uint16_t us) {
+  _wTime = us;
 }
 
 bool OSCSerial::receive() {
@@ -17,8 +19,16 @@ bool OSCSerial::receive() {
   SLIPSerial.write(0XAA);
   SLIPSerial.endPacket();
 
+  unsigned long _receiveTimer = micros();
+
   OSCBundle bndl;
   int size;
+
+  while (micros() - _receiveTimer < _wTime && !SLIPSerial.available()) {
+    if(_receiveTimer > micros()){
+      _receiveTimer = micros();
+    }
+  }
 
   if (!SLIPSerial.available()) {
     return false;
@@ -29,8 +39,6 @@ bool OSCSerial::receive() {
       while (size--) {
         bndl.fill(SLIPSerial.read());
       }
-    } else {
-      //break;
     }
   }
 
@@ -63,6 +71,8 @@ bool OSCSerial::receive() {
       for (int j = 0; j < inst->getSize(); j++) {
         if (msg.isFloat(j)) {
           (*inst)[j] = msg.getFloat(j);
+        }else if (msg.isInt(j)) {
+          (*inst)[j] = (float)msg.getInt(j);
         }
       }
     }
