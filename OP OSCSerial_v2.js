@@ -83,16 +83,13 @@ function convertToJson(oscMessage) {
     return result;
 }
 
-let logMessage = function (msg) {
+let decodeMessage = function (msg) {
     if (sending) { return; }
 
     if (msg == 170) {
         send();
         return;
     }
-
-    // op.log("A SLIP message was received! Here is it: " + msg);
-    // const uint8Array = new Uint8Array([47, 112, 111, 116, 0, 0, 0, 0, 44, 105, 0, 0, 0, 0, 3, 255]);
 
     const uint8Array = new Uint8Array(msg);
     let oscMessage, jsonMessage;
@@ -102,6 +99,7 @@ let logMessage = function (msg) {
     }
     catch (err) {
         // op.log("SLIP message couldn't be converted to OSC: ", err);
+        return;
     }
     try {
         jsonMessage = convertToJson(oscMessage);
@@ -109,6 +107,7 @@ let logMessage = function (msg) {
     }
     catch (err) {
         // op.log("OSC message couldn't be converted to JSON: ", err);
+        return;
     }
 };
 
@@ -117,7 +116,7 @@ let logError = function (msg) {
 };
 
 let decoder = new slip.Decoder({
-    "onMessage": logMessage,
+    "onMessage": decodeMessage,
     "onError": logError,
     "maxMessageSize": 209715200,
     "bufferSize": 2048
