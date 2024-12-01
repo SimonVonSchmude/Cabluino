@@ -23,7 +23,7 @@ const
     forgetTrigger = op.inTriggerButton("Forget all devices"),
 
     outObj = op.outObject("Received Data"),
-    connectState = op.outBoolNum("Connected", false),
+    // connectState = op.outBoolNum("Connected", false),
 
     lastSentSize = op.outNumber("Size of last message sent");
 
@@ -43,7 +43,7 @@ forgetTrigger.onTriggered = forgetAllPorts;
 
 function setConnectState(state) {
     connected = state;
-    connectState.set(state);
+    // connectState.set(state);
 }
 
 function newPort() {
@@ -83,13 +83,16 @@ function convertToJson(oscMessage) {
     return result;
 }
 
-let decodeMessage = function (msg) {
+let logMessage = function (msg) {
     if (sending) { return; }
 
     if (msg == 170) {
         send();
         return;
     }
+
+    // op.log("A SLIP message was received! Here is it: " + msg);
+    // const uint8Array = new Uint8Array([47, 112, 111, 116, 0, 0, 0, 0, 44, 105, 0, 0, 0, 0, 3, 255]);
 
     const uint8Array = new Uint8Array(msg);
     let oscMessage, jsonMessage;
@@ -99,7 +102,6 @@ let decodeMessage = function (msg) {
     }
     catch (err) {
         // op.log("SLIP message couldn't be converted to OSC: ", err);
-        return;
     }
     try {
         jsonMessage = convertToJson(oscMessage);
@@ -107,7 +109,6 @@ let decodeMessage = function (msg) {
     }
     catch (err) {
         // op.log("OSC message couldn't be converted to JSON: ", err);
-        return;
     }
 };
 
@@ -116,7 +117,7 @@ let logError = function (msg) {
 };
 
 let decoder = new slip.Decoder({
-    "onMessage": decodeMessage,
+    "onMessage": logMessage,
     "onError": logError,
     "maxMessageSize": 209715200,
     "bufferSize": 2048
@@ -156,7 +157,7 @@ async function connect(isNewPort, target = null) {
     }
     catch (err) {
         op.log("Connection failed:", err);
-        setConnectState(false);
+        // setConnectState(false);
         return;
     }
 
@@ -166,7 +167,7 @@ async function connect(isNewPort, target = null) {
         closePort();
     });
 
-    setConnectState(true);
+    // setConnectState(true);
     op.log("Connected to port!");
 
     keepReading = true;
@@ -216,7 +217,7 @@ async function closePort() {
         try {
             await port.close();
             port = null; // Set to null to avoid reusing an old port
-            setConnectState(false);
+            // setConnectState(false);
             op.log("Closed port!");
         }
         catch (err) {
