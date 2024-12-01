@@ -1,5 +1,5 @@
 /*
-*****************************************************/Users/simon/Documents/gitlab/Cabluino/src/Cabluino.cpp*****************
+**********************************************************************
 
 Example for sending and receiving data between an Arduino and Cables 
 using the Cabluino Library.
