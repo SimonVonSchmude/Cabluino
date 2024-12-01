@@ -4,9 +4,9 @@
 #include <OSCBundle.h>
 #include <SLIPEncodedSerial.h>
 
-class OSCSerial {
+class Cabluino {
 public:
-  OSCSerial();
+  Cabluino();
   static void begin(long baudrate);
   static void waitingTime(uint16_t us);
   static void send(OSCBundle &bundle);
@@ -17,16 +17,16 @@ private:
   static uint16_t _wTime;
 };
 
-extern OSCSerial OSCSerial;
+extern Cabluino Cabluino;
 
 template<typename T>
-class anchor {
+class cablesVal {
 private:
   static const int MAX_INSTANCES = 12;
   int size;
 
 public:
-  anchor(const char *addr, int arraySize = 1)
+  cablesVal(const char *addr, int arraySize = 1)
     : address(addr), size(arraySize) {
     if (numInstances < MAX_INSTANCES) {
       instances[numInstances++] = this;
@@ -35,7 +35,7 @@ public:
   }
 
   static int numInstances;
-  static anchor *instances[MAX_INSTANCES];
+  static cablesVal *instances[MAX_INSTANCES];
 
   const char *address;
   T *value;
@@ -54,9 +54,9 @@ public:
 };
 
 template<typename T>
-anchor<T> *anchor<T>::instances[MAX_INSTANCES] = { nullptr };
+cablesVal<T> *cablesVal<T>::instances[MAX_INSTANCES] = { nullptr };
 
 template<typename T>
-int anchor<T>::numInstances = 0;
+int cablesVal<T>::numInstances = 0;
 
 #endif

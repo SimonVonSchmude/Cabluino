@@ -1,19 +1,19 @@
-#include "OSCSerial.h"
+#include "Cabluino.h"
 // #include <OSCBundle.h>
 // #include <SLIPEncodedSerial.h>
 
-SLIPEncodedSerial OSCSerial::SLIPSerial(Serial);
-uint16_t OSCSerial::_wTime = 5;
+SLIPEncodedSerial Cabluino::SLIPSerial(Serial);
+uint16_t Cabluino::_wTime = 5;
 
-void OSCSerial::begin(long baudrate) {
+void Cabluino::begin(long baudrate) {
   SLIPSerial.begin(baudrate);
 }
 
-void OSCSerial::waitingTime(uint16_t us) {
+void Cabluino::waitingTime(uint16_t us) {
   _wTime = us;
 }
 
-bool OSCSerial::receive() {
+bool Cabluino::receive() {
 
   SLIPSerial.beginPacket();
   SLIPSerial.write(0XAA);
@@ -25,7 +25,7 @@ bool OSCSerial::receive() {
   int size;
 
   while (micros() - _receiveTimer < _wTime && !SLIPSerial.available()) {
-    if(_receiveTimer > micros()){
+    if (_receiveTimer > micros()) {
       _receiveTimer = micros();
     }
   }
@@ -50,8 +50,8 @@ bool OSCSerial::receive() {
     return false;
   }
 
-  for (int i = 0; i < anchor<int>::numInstances; i++) {
-    anchor<int> *inst = anchor<int>::instances[i];
+  for (int i = 0; i < cablesVal<int>::numInstances; i++) {
+    cablesVal<int> *inst = cablesVal<int>::instances[i];
     OSCMessage msg = bndl.getOSCMessage((char *)inst->address);
     if (!msg.hasError()) {
       for (int j = 0; j < inst->getSize(); j++) {
@@ -64,14 +64,14 @@ bool OSCSerial::receive() {
     }
   }
 
-  for (int i = 0; i < anchor<float>::numInstances; i++) {
-    anchor<float> *inst = anchor<float>::instances[i];
+  for (int i = 0; i < cablesVal<float>::numInstances; i++) {
+    cablesVal<float> *inst = cablesVal<float>::instances[i];
     OSCMessage msg = bndl.getOSCMessage((char *)inst->address);
     if (!msg.hasError()) {
       for (int j = 0; j < inst->getSize(); j++) {
         if (msg.isFloat(j)) {
           (*inst)[j] = msg.getFloat(j);
-        }else if (msg.isInt(j)) {
+        } else if (msg.isInt(j)) {
           (*inst)[j] = (float)msg.getInt(j);
         }
       }
@@ -81,7 +81,7 @@ bool OSCSerial::receive() {
   return true;
 }
 
-void OSCSerial::send(OSCBundle &bundleOUT) {
+void Cabluino::send(OSCBundle &bundleOUT) {
   SLIPSerial.beginPacket();
   bundleOUT.send(SLIPSerial);
   SLIPSerial.endPacket();
