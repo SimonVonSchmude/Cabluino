@@ -1,5 +1,5 @@
-#ifndef OSCSerial_h
-#define OSCSerial_h
+#ifndef Cabluino_h
+#define Cabluino_h
 
 #include <OSCBundle.h>
 #include <SLIPEncodedSerial.h>

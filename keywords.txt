@@ -1,0 +1,23 @@
+# Syntax Coloring Map For Cabluino
+
+# Classes (KEYWORD1)
+Cabluino	KEYWORD1
+cablesVal	KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+begin	KEYWORD2
+waitingTime	KEYWORD2
+send	KEYWORD2
+receive	KEYWORD2
+getSize	KEYWORD2
+
+# Constants (LITERAL1)
+MAX_INSTANCES	LITERAL1
+
+# Variables (KEYWORD3)
+SLIPSerial	KEYWORD3
+_wTime	KEYWORD3
+numInstances	KEYWORD3
+instances	KEYWORD3
+address	KEYWORD3
+value	KEYWORD3
