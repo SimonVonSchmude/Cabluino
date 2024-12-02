@@ -23,7 +23,7 @@ const
     forgetTrigger = op.inTriggerButton("Forget all devices"),
 
     outObj = op.outObject("Received Data"),
-    // connectState = op.outBoolNum("Connected", false),
+    connectState = op.outBoolNum("Connected", false),
 
     lastSentSize = op.outNumber("Size of last message sent");
 
@@ -43,7 +43,7 @@ forgetTrigger.onTriggered = forgetAllPorts;
 
 function setConnectState(state) {
     connected = state;
-    // connectState.set(state);
+    connectState.set(state);
 }
 
 function newPort() {
@@ -157,7 +157,7 @@ async function connect(isNewPort, target = null) {
     }
     catch (err) {
         op.log("Connection failed:", err);
-        // setConnectState(false);
+        setConnectState(false);
         return;
     }
 
@@ -167,7 +167,7 @@ async function connect(isNewPort, target = null) {
         closePort();
     });
 
-    // setConnectState(true);
+    setConnectState(true);
     op.log("Connected to port!");
 
     keepReading = true;
@@ -217,7 +217,7 @@ async function closePort() {
         try {
             await port.close();
             port = null; // Set to null to avoid reusing an old port
-            // setConnectState(false);
+            setConnectState(false);
             op.log("Closed port!");
         }
         catch (err) {
