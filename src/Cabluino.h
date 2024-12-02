@@ -22,7 +22,7 @@ extern Cabluino Cabluino;
 template<typename T>
 class cablesVal {
 private:
-  static const int MAX_INSTANCES = 12;
+  static const int MAX_INSTANCES = 64;
   int size;
 
 public:
