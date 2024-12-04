@@ -18,7 +18,6 @@ const
 
     sendObject = op.inObject("Data"),
 
-    // sendTrigger = op.inTriggerButton("Send"),
     closeTrigger = op.inTriggerButton("Close"),
     forgetTrigger = op.inTriggerButton("Forget all devices"),
 
@@ -37,7 +36,6 @@ let sending = false;
 baudRate.onChange = closePort;
 connectNewTrigger.onTriggered = newPort;
 connectLastTrigger.onTriggered = lastPort;
-// sendTrigger.onTriggered = send;
 closeTrigger.onTriggered = closePort;
 forgetTrigger.onTriggered = forgetAllPorts;
 
@@ -127,14 +125,20 @@ let decoder = new slip.Decoder({
 
 async function connect(isNewPort, target = null) {
     if (connected) {
-        op.log("Already connected");
+        op.setUiError("connected", "Already connected", 1);
+        //op.log("Already connected");
         return;
     }
 
+    op.setUiError("connected", null);
+
     if (!("serial" in navigator)) {
-        op.log("This only works in Chrome!");
+        op.setUiError("chrome", "WebSerial only works in Chrome!", 2);
+        //op.log("WebSerial only works in Chrome!");
         return;
     }
+
+    op.setUiError("chrome", null);
 
     try {
         if (isNewPort) {
@@ -156,19 +160,30 @@ async function connect(isNewPort, target = null) {
         await port.open({ "baudRate": baudRate.get() });
     }
     catch (err) {
-        op.log("Connection failed:", err);
+        // op.log("Connection failed: ", err);
+        const errorMsg = "Connection failed: ".concat(err);
+        op.setUiError("connection", errorMsg, 1);
         setConnectState(false);
         return;
     }
 
+    op.setUiError("connection", null);
+
     port.addEventListener("disconnect", (event) => {
-        op.log("Your board disconnected!");
-        op.log("Closing Port...");
+        // op.setUiError("disconnected", "Your Board disconnected, closing port...", 1);
+
+        // op.log("Your board disconnected!");
+        // op.log("Closing Port...");
         closePort();
     });
 
     setConnectState(true);
-    op.log("Connected to port!");
+
+    op.setUiError("closedPort", null);
+    op.setUiError("noPorts", null);
+    op.setUiError("forgotPorts", null);
+    op.setUiError("connectedPort", "Connected to port!", 0);
+    //op.log("Connected to port!");
 
     keepReading = true;
     readUntilClosed();
@@ -189,7 +204,7 @@ async function readUntilClosed() {
             }
         }
         catch (err) {
-            op.log("Failed to read data:", err);
+            op.log("Failed to read data: ", err);
         }
         finally {
             reader.releaseLock();
@@ -209,7 +224,7 @@ async function closePort() {
             reader = null; // Set to null to avoid reusing an old reader
         }
         catch (err) {
-            op.log("Error canceling reader:", err);
+            op.log("Error canceling reader: ", err);
         }
     }
 
@@ -218,10 +233,15 @@ async function closePort() {
             await port.close();
             port = null; // Set to null to avoid reusing an old port
             setConnectState(false);
-            op.log("Closed port!");
+            op.setUiError("connectedPort", null);
+            op.setUiError("noPorts", null);
+            op.setUiError("forgotPorts", null);
+            op.setUiError("closedPort", "Closed port!", 0);
+            // op.log("Closed port!");
         }
         catch (err) {
-            op.log("Error closing port:", err);
+            op.setUiError("closedPort", "Error closing port", 1);
+            // op.log("Error closing port: ", err);
         }
     }
 }
@@ -232,7 +252,8 @@ async function forgetAllPorts() {
     const ports = await navigator.serial.getPorts();
 
     if (ports.length === 0) {
-        op.log("No ports to forget!");
+        op.setUiError("noPorts", "No ports to forget!", 1);
+        //        op.log("No ports to forget!");
         return;
     }
 
@@ -241,10 +262,11 @@ async function forgetAllPorts() {
             await port.forget();
         }
 
-        op.log("Forgot all ports!");
+        op.setUiError("forgotPorts", "Forgot all ports!", 0);
+        // op.log("Forgot all ports!");
     }
     catch (err) {
-        op.log("Error forgetting ports:", err);
+        op.log("Error forgetting ports: ", err);
     }
 }
 
@@ -265,7 +287,8 @@ async function send() {
         await writer.write(slipEncoded);
     }
     catch (err) {
-        op.log("Error while sending message:", err);
+        // op.setUiError("sending", "Error while sending message!", 2);
+        // op.log("Error while sending message: ", err);
     }
     finally {
         writer.releaseLock();
@@ -277,15 +300,18 @@ async function send() {
 
 function inferType(value) {
     if (Number.isInteger(value)) {
+        op.setUiError("dataType", null);
         return "i";
     }
     else if (typeof value === "number") {
+        op.setUiError("dataType", null);
         return "f";
     }
     else if (typeof value === "string") {
+        op.setUiError("dataType", null);
         return "s";
     }
-    op.setUiError("", "Unsupported value type in input object! Must be integer, float or string.");
+    op.setUiError("dataType", "Unsupported value type in input object! Must be integer, float or string.", 1);
 }
 
 function transformJsonToOsc(json) {
