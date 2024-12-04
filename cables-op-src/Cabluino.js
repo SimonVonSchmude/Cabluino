@@ -57,7 +57,7 @@ function lastPort() {
 // –––––––––
 
 navigator.serial.addEventListener("connect", (event) => {
-    if (autoConnect) {
+    if (autoConnect.get()) {
         connect(false, event.target);
     }
 });
