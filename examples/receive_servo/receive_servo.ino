@@ -30,7 +30,7 @@ void setup() {
 
 void loop() {
   if (Cabluino.receive()) {              // if Arduino receives a valid message from Cables...
-    myServo.write(servoAngle.value[0]);  // take the receives "/servo" value and write it as an angle to the servo motor
+    myServo.write(servoAngle.value[0]);  // ... take the received "/servo" value and write it as an angle to the servo motor
   }
 
   delay(10);  // delay for giving the servo time to reach its destination
